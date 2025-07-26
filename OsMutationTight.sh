@@ -1,5 +1,5 @@
 #!/bin/bash
-# Reinstall Any OpenVZ/LXC VPS to Debian/CentOS/Alpine
+# Reinstall Any OpenVZ/LXC VPS to ubuntu/CentOS/Alpine
 # Author: Lloyd@nodeseek.com
 # WARNING: A fresh system will be installed and all old data will be wiped.
 # License: GPLv3; Partly based on https://gist.github.com/trimsj/c1fefd650b5f49ceb8f3efc1b6a1404d
@@ -15,7 +15,7 @@ function print_help(){
 		╚██████╔╝███████║██║ ╚═╝ ██║╚██████╔╝   ██║   ██║  ██║   ██║   ██║╚██████╔╝██║ ╚████║
 		 ╚═════╝ ╚══════╝╚═╝     ╚═╝ ╚═════╝    ╚═╝   ╚═╝  ╚═╝   ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝
                                                                                      
-		Reinstall Any OpenVZ/LXC VPS to Debian/CentOS/Alpine;
+		Reinstall Any OpenVZ/LXC VPS to ubuntu/CentOS/Alpine;
 		[warning] A fresh system will be installed and all old data will be wiped!
 		Author: Lloyd@nodeseek.com
 	EOF
@@ -73,7 +73,7 @@ function read_lxc_template(){
         server=http://images.linuxcontainers.org
         path=$(wget -qO- ${server}/meta/1.0/index-system | \
             grep -v edge | grep default | \
-            awk '-F;' '(( $1=="debian" || $1=="centos" || $1=="alpine") && ( $3=="amd64" || $3=="i386")) {print $NF}')
+            awk '-F;' '(( $1=="ubuntu" || $1=="centos" || $1=="alpine") && ( $3=="amd64" || $3=="i386")) {print $NF}')
 
         os_list=$( echo "$path" | sed -E 's%/images/(.*)/default/.*/%\1%g' | sed 's%/%-%g' )
         echo "$os_list" | nl
@@ -93,7 +93,7 @@ function read_openvz_template(){
     releasetag="v0.0.1"
     os_list=$(wget -qO- "https://github.com/LloydAsp/OsMutation/releases/expanded_assets/v0.0.1" | \
         sed -nE '/tar.gz/s/.*>([^<>]+)\.tar\.gz.*/\1/p' | \
-        grep -E "(debian)|(centos)|(alpine)" )
+        grep -E "(ubuntu)|(centos)|(alpine)" )
     echo "$os_list" | nl
 
     while [ -z "${os_index##*[!0-9]*}" ]; 
@@ -177,7 +177,7 @@ function post_install(){
             rc-update add networking default
             sed -i 's/--auto/-a/' /etc/init.d/networking # fix bug in networking script of lxc
         fi
-    elif grep -qi debian /etc/issue; then
+    elif grep -qi ubuntu /etc/issue; then
         install ssh
         if grep -qa container=lxc /proc/1/environ ; then
             install ifupdown
