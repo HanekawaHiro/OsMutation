@@ -1,5 +1,5 @@
 #!/bin/bash
-# Reinstall Any OpenVZ/LXC VPS to Debian/CentOS/Alpine
+# Reinstall Any OpenVZ/LXC VPS to ubuntu/CentOS/Alpine
 # Author: Lloyd@nodeseek.com
 # WARNING: A fresh system will be installed and all old data will be wiped.
 # License: GPLv3; Partly based on https://gist.github.com/trimsj/c1fefd650b5f49ceb8f3efc1b6a1404d
@@ -15,7 +15,7 @@ function print_help(){
 		╚██████╔╝███████║██║ ╚═╝ ██║╚██████╔╝   ██║   ██║  ██║   ██║   ██║╚██████╔╝██║ ╚████║
 		 ╚═════╝ ╚══════╝╚═╝     ╚═╝ ╚═════╝    ╚═╝   ╚═╝  ╚═╝   ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝
                                                                                      
-		Reinstall Any OpenVZ/LXC VPS to Debian/CentOS/Alpine;
+		Reinstall Any OpenVZ/LXC VPS to ubuntu/CentOS/Alpine;
 		[warning] A fresh system will be installed and all old data will be wiped!
 		Author: Lloyd@nodeseek.com
 	EOF
@@ -73,7 +73,7 @@ function read_lxc_template(){
         server=http://images.linuxcontainers.org
         path=$(wget -qO- ${server}/meta/1.0/index-system | \
             grep -v edge | grep default | \
-            awk '-F;' '(( $1=="debian" || $1=="centos" || $1=="alpine") && ( $3=="amd64" || $3=="i386")) {print $NF}')
+            awk '-F;' '(( $1=="ubuntu" || $1=="centos" || $1=="alpine") && ( $3=="amd64" || $3=="i386")) {print $NF}')
 
         os_list=$( echo "$path" | sed -E 's%/images/(.*)/default/.*/%\1%g' | sed 's%/%-%g' )
         echo "$os_list" | nl
@@ -154,8 +154,8 @@ change_hostname() {
     # Detect the Linux distribution
     if [ -f "/etc/alpine-release" ]; then
         os_release="alpine"
-    elif [ -f "/etc/debian_version" ]; then
-        os_release="debian"
+    elif [ -f "/etc/ubuntu_version" ]; then
+        os_release="ubuntu"
     elif [ -f "/etc/centos-release" ]; then
         os_release="centos"
     else
@@ -169,7 +169,7 @@ change_hostname() {
             echo "$new_hostname" > /etc/hostname
             hostname -F /etc/hostname
             ;;
-        "debian")
+        "ubuntu")
             echo "$new_hostname" > /etc/hostname
             hostnamectl set-hostname "$new_hostname"
             ;;
@@ -205,10 +205,10 @@ function post_install(){
         install grub grub-bios linux-lts
         echo 'GRUB_CMDLINE_LINUX_DEFAULT="quiet rootfstype=ext4 modules=sd-mod,usb-storage,ext4"' >> /etc/default/grub
         grub-mkconfig -o /boot/grub/grub.cfg
-    elif grep -qi debian /etc/issue; then
+    elif grep -qi ubuntu /etc/issue; then
         install ssh ifupdown
         systemctl disable systemd-networkd.service
-        change_hostname debian
+        change_hostname ubuntu
         install fdisk linux-image-generic grub-pc
         grub-install "$target_disk"
         update-grub
